@@ -1252,6 +1252,7 @@ bool Manager::updateModule()
             reinforce_obstacle_cnt=0;
             encourage_cnt=0;
             t0=Time::now();
+            tstart=t0; //The exercises really starts when the person is standing
         }
         else
         {
@@ -1441,7 +1442,7 @@ void Manager::start_interaction()
             state=obstacle_manager->hasObstacle()
                     ? State::obstacle : State::assess_standing;
             reinforce_obstacle_cnt=0;
-            t0=tstart=Time::now();
+            t0=Time::now();
             yInfo()<<"Start!";
         }
     }
