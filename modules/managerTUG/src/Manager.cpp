@@ -1309,6 +1309,14 @@ bool Manager::updateModule()
     if (state==State::line_crossed)
     {
         prev_state=state;
+
+        if(human_state=="out_of_bounds")
+        {
+            state=obstacle_manager->hasObstacle()
+                ? State::obstacle : State::out_of_bounds;
+            reinforce_obstacle_cnt=0;
+            yInfo()<<"Stop!";
+        }
         //detect when the person seats down
         if(human_state=="sitting")
         {
@@ -1360,6 +1368,29 @@ bool Manager::updateModule()
         speak(s);
         s.reset();
         s.setKey("assess-low");
+        speak(s);
+        s.reset();
+        s.setKey("greetings");
+        speak(s);
+        success_status = "not_passed";
+        cmd.clear();
+        cmd.addString("stop");
+        collectorPort.write(cmd, rep);
+        disengage();
+    }
+
+    if (state==State::out_of_bounds)
+    {
+        yCDebug(MANAGERTUG) << "Entering state::out_of_bounds";
+        t=Time::now()-tstart;
+        prev_state=state;
+        Bottle cmd,rep;
+        cmd.addString("stop");
+        analyzerPort.write(cmd,rep);
+        Speech s("end",true,false);
+        speak(s);
+        s.reset();
+        s.setKey("assess-out-of-bounds");
         speak(s);
         s.reset();
         s.setKey("greetings");

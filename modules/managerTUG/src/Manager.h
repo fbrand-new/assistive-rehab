@@ -75,7 +75,8 @@ private:
                        reach_line,
                        starting, 
                        not_passed, 
-                       finished } state;
+                       finished,
+                       out_of_bounds } state;
     State prev_state;
     std::string tag;
     double t0,tstart,t;
