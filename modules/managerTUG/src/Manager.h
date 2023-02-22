@@ -60,6 +60,7 @@ private:
 
     const int ok=Vocab32::encode("ok");
     const int fail=Vocab32::encode("fail");
+    
     enum class State { stopped, 
                        idle, 
                        obstacle, 
@@ -78,6 +79,8 @@ private:
                        finished,
                        out_of_bounds } state;
     State prev_state;
+    bool _was_person_out_of_bounds;
+
     std::string tag;
     double t0,tstart,t;
     int encourage_cnt,reinforce_engage_cnt;

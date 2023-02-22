@@ -13,8 +13,9 @@ Manager::Manager() :
     interrupting(false),
     world_configured(false), 
     ok_go(false), 
-    connected(false), 
-    params_set(false) 
+    connected(false),
+    params_set(false),
+    _was_person_out_of_bounds{false}
 { }
 
 
@@ -1312,18 +1313,24 @@ bool Manager::updateModule()
 
         if(human_state=="out_of_bounds")
         {
-            state=obstacle_manager->hasObstacle()
-                ? State::obstacle : State::out_of_bounds;
-            reinforce_obstacle_cnt=0;
-            yInfo()<<"Stop!";
+            _was_person_out_of_bounds = true;
+            yInfo()<<"Person is out of bounds!";
         }
         //detect when the person seats down
         if(human_state=="sitting")
         {
+            State next_state;
+            if(_was_person_out_of_bounds)
+            {
+                next_state = State::not_passed;
+            }
+            else
+            {
+                next_state = State::finished;
+            }
             state=obstacle_manager->hasObstacle()
-                    ? State::obstacle : State::finished;
+                    ? State::obstacle : next_state;
             reinforce_obstacle_cnt=0;
-            t=Time::now()-tstart;
             yInfo()<<"Stop!";
         }
         else
@@ -1335,9 +1342,8 @@ bool Manager::updateModule()
     if (state==State::finished)
     {
         yCDebug(MANAGERTUG) << "Entering state::finished";
-        t=Time::now()-tstart;
         prev_state=state;
-        yInfo()<<"Test finished in"<<t<<"seconds";
+        yInfo()<<"Test finished";
         vector<shared_ptr<SpeechParam>> p;
         p.push_back(shared_ptr<SpeechParam>(new SpeechParam(round(t*10.0)/10.0)));
         Bottle cmd,rep;
@@ -1359,7 +1365,6 @@ bool Manager::updateModule()
     if (state==State::not_passed)
     {
         yCDebug(MANAGERTUG) << "Entering state::not_passed";
-        t=Time::now()-tstart;
         prev_state=state;
         Bottle cmd,rep;
         cmd.addString("stop");
@@ -1367,30 +1372,14 @@ bool Manager::updateModule()
         Speech s("end",true,false);
         speak(s);
         s.reset();
-        s.setKey("assess-low");
-        speak(s);
-        s.reset();
-        s.setKey("greetings");
-        speak(s);
-        success_status = "not_passed";
-        cmd.clear();
-        cmd.addString("stop");
-        collectorPort.write(cmd, rep);
-        disengage();
-    }
-
-    if (state==State::out_of_bounds)
-    {
-        yCDebug(MANAGERTUG) << "Entering state::out_of_bounds";
-        t=Time::now()-tstart;
-        prev_state=state;
-        Bottle cmd,rep;
-        cmd.addString("stop");
-        analyzerPort.write(cmd,rep);
-        Speech s("end",true,false);
-        speak(s);
-        s.reset();
-        s.setKey("assess-out-of-bounds");
+        if(_was_person_out_of_bounds)
+        {
+            s.setKey("assess-out-of-bounds");
+        }
+        else
+        {
+            s.setKey("assess-low");
+        }
         speak(s);
         s.reset();
         s.setKey("greetings");
