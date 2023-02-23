@@ -1,5 +1,4 @@
-#ifndef MANAGERTUG_MANAGER_H
-#define MANAGERTUG_MANAGER_H
+#pragma once
 
 #include <yarp/os/RFModule.h>
 #include <yarp/os/ResourceFinder.h>
@@ -13,7 +12,7 @@
 #include <yarp/os/LogComponent.h>
 
 #include <condition_variable>
-
+#include <memory>
 #include <mutex>
 #include <cmath>
 
@@ -70,20 +69,22 @@ private:
                        seek_skeleton, 
                        follow, frozen, 
                        assess_standing,
-                       assess_crossing, 
-                       line_crossed, 
-                       engaged, point_start, 
-                       explain, point_line, 
+                       assess_crossing,
+                       line_crossed,
+                       engaged, point_start,
+                       explain, point_line,
                        reach_line,
-                       starting, 
-                       not_passed, 
-                       finished,
-                       out_of_bounds } state;
+                       questions,
+                       wait_to_start,
+                       starting,
+                       not_passed,
+                       finished } state;
     State prev_state;
     bool _was_person_out_of_bounds;
 
     std::string tag;
     double t0,tstart,t;
+    double question_time_tstart;
     int encourage_cnt,reinforce_engage_cnt;
     int reinforce_obstacle_cnt;
     std::unordered_map<std::string,std::string> speak_map;
@@ -114,46 +115,46 @@ private:
     RpcClient collectorPort;
     BufferedPort<Bottle> obstaclePort;
 
-    AnswerManager *answer_manager;
-    HandManager *hand_manager;
-    TriggerManager *trigger_manager;
-    ObstacleManager *obstacle_manager;
+    std::unique_ptr<AnswerManager> answer_manager;
+    std::unique_ptr<HandManager> hand_manager;
+    std::unique_ptr<TriggerManager> trigger_manager;
+    std::unique_ptr<ObstacleManager> obstacle_manager;
 public:
 
     Manager();
 
     bool attach(RpcServer &source) override;
-    
+
     bool load_speak(const std::string &context, const std::string &speak_file);
 
     bool speak(Speech &s);
-    
+
     std::string get_sentence(std::string &value, const std::vector<std::shared_ptr<SpeechParam>> &p) const;
-    
+
     std::string get_animation();
-    
+
     bool play_animation(const std::string &name);
-    
+
     bool play_from_last();
-   
+
     bool set_auto();
 
     bool send_stop(const RpcClient &port);
-   
+
     bool is_navigating();
-    
+
     bool disengage();
-    
+
     void resume_animation();
-    
+
     bool go_to(const Vector &target, const bool &wait);
 
     bool remove_locked();
-   
+
     bool start() override;
-    
+
     bool trigger() override;
-   
+
     bool set_target(const double x, const double y, const double theta) override;
 
     double get_measured_time() override;
@@ -177,8 +178,10 @@ public:
     void start_interaction();
 
     bool start_collection();
- 
-    void set_walking_speed(const Bottle &r);
+
+    bool set_analyzer_param(const std::string & option, const std::string & arg);
+
+    void get_walking_speed(const Bottle &r);
 
     bool is_active();
 
@@ -197,7 +200,6 @@ public:
     bool interruptModule() override;
 
     bool close() override;
+
+    void confirmWithRaisedHand(State next_state);
 };
-
-
-#endif //MANAGERTUG_MANAGER_H
