@@ -1074,7 +1074,7 @@ bool Manager::updateModule()
         s.dontWait();
         speak(s);
         state=obstacle_manager->hasObstacle()
-                ? State::obstacle : State::starting;
+                ? State::obstacle : State::questions;
         reinforce_obstacle_cnt=0;
     }
 
@@ -1132,9 +1132,9 @@ bool Manager::updateModule()
         Bottle cmd,rep;
         cmd.addString("track_skeleton");
         cmd.addString(tag);
-        if (navigationPort.write(cmd,rep))
+        if (true || navigationPort.write(cmd,rep))
         {
-            if (rep.get(0).asVocab32()==ok)
+            if (true || rep.get(0).asVocab32()==ok)
             {
                 cmd.clear();
                 rep.clear();
