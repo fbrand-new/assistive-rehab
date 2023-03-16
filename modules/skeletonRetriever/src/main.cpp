@@ -229,6 +229,7 @@ class Retriever : public RFModule
 {
     BufferedPort<Bottle> skeletonsPort;
     BufferedPort<ImageOf<PixelFloat>> depthPort;
+    BufferedPort<ImageOf<PixelFloat>> filteredDepthPort; //This port is temporary for debugging purpouses
     BufferedPort<Bottle> viewerPort;
     BufferedPort<Property> navPort;
     BufferedPort<Property> gazePort;
@@ -896,6 +897,7 @@ class Retriever : public RFModule
 
         skeletonsPort.open("/skeletonRetriever/skeletons:i");
         depthPort.open("/skeletonRetriever/depth:i");
+        filteredDepthPort.open("/skeletonRetriever/depth:o");
         viewerPort.open("/skeletonRetriever/viewer:o");
         navPort.open("/skeletonRetriever/nav:i");
         gazePort.open("/skeletonRetriever/gaze:i");
@@ -920,6 +922,8 @@ class Retriever : public RFModule
         const double dt=t-t0;
         t0=t;
 
+        ImageOf<PixelFloat> &outDepth = filteredDepthPort.prepare();
+        
         if (ImageOf<PixelFloat> *depth=depthPort.read(false))
         {
             if (depth_enable)
@@ -932,6 +936,12 @@ class Retriever : public RFModule
                 this->depth=*depth;
             }
         }
+
+        outDepth = this->depth;
+
+        Stamp aStamp;
+        filteredDepthPort.setEnvelope(aStamp);
+        filteredDepthPort.write();
 
         if (!camera_configured)
         {
@@ -989,7 +999,7 @@ class Retriever : public RFModule
                         auto it=min_element(scores.begin(),scores.end());
                         if (it!=scores.end())
                         {
-                            if (*it<numeric_limits<double>::infinity())
+                            if (*it < numeric_limits<double>::infinity())
                             {
                                 auto i=distance(scores.begin(),it);
                                 auto &s=pending[i];
@@ -1028,6 +1038,7 @@ class Retriever : public RFModule
 
         skeletonsPort.close();
         depthPort.close();
+        filteredDepthPort.close();
         viewerPort.close();
         navPort.close();
         gazePort.close();

@@ -8,7 +8,7 @@ LABEL maintainer="mattia.fussi@iit.it, ettore.landini@iit.it, marco.randazzo@iit
 ARG PROJECTS_DIR=/projects
 ARG CMAKE_GENERATOR="Unix Makefiles"
 ARG BUILD_TYPE=Release
-ARG CMAKE_EXTRA_OPTIONS=-j10
+ARG CMAKE_EXTRA_OPTIONS=-j8
 # ARG INSTALL_DIR="${PROJECTS_DIR}/robotology-superbuild/build/install/share/ICUBcontrib"
 ARG INSTALL_DIR="/usr/local"
 
@@ -23,7 +23,7 @@ RUN cd ${PROJECTS_DIR} &&  \
     rm -rf build/ && \
     git remote add fbrand https://github.com/fbrand-new/assistive-rehab.git && \
     git fetch --all && \
-    git checkout develop && \
+    git checkout experiment/depthPort && \
     git pull --rebase && mkdir build && \
     cd build && \
     cmake .. \
