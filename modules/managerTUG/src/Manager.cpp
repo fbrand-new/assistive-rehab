@@ -1084,7 +1084,7 @@ bool Manager::updateModule()
 
     if (state == State::questions)
     {
-        yCDebug(MANAGERTUG) << "Entering State::questions";
+        yCDebugOnce(MANAGERTUG) << "Entering State::questions";
 
         bool is_entered_question_time = prev_state != state;
 
