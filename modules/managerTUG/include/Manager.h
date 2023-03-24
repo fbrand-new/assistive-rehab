@@ -116,6 +116,7 @@ private:
     RpcClient triggerPort;
     RpcClient gazeboPort;
     RpcClient collectorPort;
+    RpcClient opcRpcPort;
     BufferedPort<Bottle> obstaclePort;
 
     std::unique_ptr<AnswerManager> answer_manager;
@@ -197,6 +198,8 @@ public:
     bool hasLine(Property &prop, std::string line);
 
     bool getWorld(const Property &prop_finish_line, const Property &prop_start_line);
+
+    bool opcRpcDel();
 
     bool findLocked(std::string &t);
 

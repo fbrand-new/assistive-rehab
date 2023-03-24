@@ -569,6 +569,7 @@ bool Manager::configure(ResourceFinder &rf)
     collectorPort.open("/"+module_name+"/collector:rpc");
     cmdPort.open("/"+module_name+"/cmd:rpc");
     opcPort.open("/"+module_name+"/opc:i");
+    opcRpcPort.open("/"+module_name+"/opc:rpc");
     if (lock)
     {
         lockerPort.open("/"+module_name+"/locker:rpc");
@@ -592,6 +593,7 @@ bool Manager::configure(ResourceFinder &rf)
 
     if(detect_hand_up)
     {
+        yDebug() << " hand manager started";
         hand_manager = std::make_unique<HandManager>(module_name,arm_thresh);
         if (!hand_manager->start())
         {
@@ -1734,6 +1736,39 @@ bool Manager::getWorld(const Property &prop_finish_line, const Property &prop_st
     return false;
 }
 
+bool Manager::opcRpcDel()
+{   
+    // First ask skeleton id to be removed
+    Bottle cmdAsk,repAsk;
+    int id = -1;
+    bool esitoAsk = false;
+    cmdAsk.addVocab32("ask");
+    Bottle &plAsk=cmdAsk.addList().addList();
+    plAsk.addString("skeleton");
+    if (opcRpcPort.write(cmdAsk,repAsk))
+    {
+        esitoAsk = (repAsk.get(0).asVocab32()==Vocab32::encode("ack"));
+        if (!esitoAsk) 
+            yError()<<"opc error";
+        else
+            id = repAsk.get(1).asList()->get(1).asList()->get(0).asInt32();
+    }
+
+    // Then delete the skeleton
+    Bottle cmdDel,repDel;
+    bool esitoDel = false;
+    cmdDel.addVocab32("del");
+    Bottle &plDel=cmdDel.addList().addList();
+    plDel.addString("id");
+    plDel.addInt32(id);
+    if (opcRpcPort.write(cmdDel,repDel))
+    {
+        esitoDel = (repDel.get(0).asVocab32()==Vocab32::encode("ack"));
+    }
+
+    return esitoDel;
+}
+
 
 bool Manager::findLocked(string &t)
 {
@@ -1793,6 +1828,8 @@ bool Manager::close()
     rightarmPort.close();
     speechStreamPort.close();
     collectorPort.close();
+    opcRpcDel();
+    opcRpcPort.close();
     opcPort.close();
     cmdPort.close();
     if (lock)
