@@ -235,9 +235,6 @@ class Attention : public RFModule, public attentionManager_IDL
         if ((*s)[KeyPointTag::elbow_left]->isUpdated() &&
             (*s)[KeyPointTag::hand_left]->isUpdated())
         {
-            yDebug() << "elbow left" << (*s)[KeyPointTag::elbow_left]->getPoint()[dir];
-            yDebug() << "left hand" << (*s)[KeyPointTag::hand_left]->getPoint()[dir];
-
             if (k*(((*s)[KeyPointTag::elbow_left]->getPoint()[dir]-
                     (*s)[KeyPointTag::hand_left]->getPoint()[dir]))>0.15)
                 return true;
@@ -245,9 +242,6 @@ class Attention : public RFModule, public attentionManager_IDL
         if ((*s)[KeyPointTag::elbow_right]->isUpdated() &&
             (*s)[KeyPointTag::hand_right]->isUpdated())
         {
-
-            yDebug() << "right elbow" << (*s)[KeyPointTag::elbow_right]->getPoint()[dir];
-            yDebug() << "right hand" << (*s)[KeyPointTag::hand_right]->getPoint()[dir];
             if (k*(((*s)[KeyPointTag::elbow_right]->getPoint()[dir]-
                     (*s)[KeyPointTag::hand_right]->getPoint()[dir]))>0.15)
                 return true;
