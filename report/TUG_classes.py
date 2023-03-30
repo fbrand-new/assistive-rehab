@@ -16,6 +16,7 @@ import os
 import glob
 from os.path import expanduser
 import datetime
+import pickle
 import statistics as stats
 from plotly import __version__
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
@@ -219,9 +220,8 @@ class Step(Metric):
         self.durata= durata
 
 
-    def compute(self,skeleton):
-        print('durata')
-        print(self.durata)
+    def compute(self,skeleton, user_id):
+        
         in_stand_idx, in_wf_idx, fin_wf_idx, fin_turn1_idx, fin_wb_idx, fin_turn2_idx, fin_sit_idx = compute_timing(skeleton, self.durata)
         timing_vec= [in_stand_idx, in_wf_idx, fin_wf_idx, fin_turn1_idx, fin_wb_idx, fin_turn2_idx, fin_sit_idx]
         timing_vec2= [self.tstanding, self.tforward, self.tturning1, self.tbackward, self.tturning2, self.tsitting, self.tend]
@@ -271,57 +271,59 @@ class Step(Metric):
             self.step_length = stats.mean(slen)
             self.step_width = np.fabs(ankles_diff) #da modificare
 
-        with open ('report.txt', 'w') as file:   #Durata delle sottofasi: alzata, cammino andata, curva, cammino ritorno, seduta, numero di passi totali e nelle varie fasi, cadenza (passi al minuto). 
-            for i in range(len(timing_vec)-1):
+        results = {}
+        for i in range(len(timing_vec)-1):
 
-                file.writelines('Fase: '+ phases_names[i] + '\n')    
-                tmp_idx=np.intersect1d(np.where(self.strikes>timing_vec[i]), np.where(self.strikes<timing_vec[i+1]))
-                self.nsteps = len(self.strikes[tmp_idx])
-                file.writelines('Passi: '+ str(self.nsteps) + '\n') 
-                self.ex_time = timing_vec2[i+1] - timing_vec2[i]
-                file.writelines('Tempo esecuzione: '+ str(format(self.ex_time,'.2f')) +' s\n') 
-                self.cadence = self.nsteps / self.ex_time
-                file.writelines('Pacing: '+ str(format(self.cadence,'.2f')) +' step/s\n') 
-                
-                move= np.diff(hip_filtered[timing_vec[i]:timing_vec[i+1],:2], axis=0)
-                lengthmove = sum(np.linalg.norm(move, axis=1))
-                self.speed =  lengthmove / self.ex_time      
-                file.writelines('Velocity: '+ str(format(self.speed,'.2f')) +' m/s\n') 
-                file.writelines('Acceleration: '+ str(format(self.speed/self.ex_time,'.2f')) +' m/s^2\n') 
-
-                move_z= np.diff(hip_filtered[timing_vec[i]:timing_vec[i+1],2], axis=0)
-                lengthmove_z = sum(abs(move_z))
-                self.speed_z =  lengthmove_z / self.ex_time      
-                file.writelines('Velocity in z: '+ str(format(self.speed_z,'.2f')) +' m/s\n') 
-                file.writelines('Acceleration in z: '+ str(format(self.speed_z/self.ex_time,'.2f')) +' m/s^2\n') 
-                file.writelines('\n')
-
-
-            file.writelines('Full TUG\n')    
-            self.nsteps = len(self.strikes)
-            file.writelines('Steps: '+ str(self.nsteps) +'\n') 
-            self.walking_time = timing_vec2[-2] - timing_vec2[1] #Durata totale del test: calcolata in automatico da quando il paziente si alza (gli ischi si staccano dalla sedia) a quando si risiede (gli ischi si appoggiano sulla sedia)
-            file.writelines('Tempo di camminata: '+ str(format(self.walking_time,'.2f')) +' s\n')
-            self.ex_time = timing_vec2[-1] - timing_vec2[0] #Durata totale del test: calcolata in automatico da quando il paziente si alza (gli ischi si staccano dalla sedia) a quando si risiede (gli ischi si appoggiano sulla sedia)
-            file.writelines('Tempo TUG: '+ str(format(self.ex_time,'.2f')) +' s\n') 
-            file.writelines('Mean step length: '+ str(format(self.step_length,'.2f')) +' m\n') 
-            file.writelines('Mean step width: '+ str(format(self.step_width,'.2f')) +' m\n') 
-
-            self.cadence = self.nsteps / self.walking_time
-            file.writelines('Pacing: '+ str(format(self.cadence,'.2f')) +' step/s\n')  
-                
-            move= np.diff(hip_filtered[timing_vec[1]:timing_vec[-2],:2], axis=0)
+            results[phases_names[i]]={}   
+            tmp_idx=np.intersect1d(np.where(self.strikes>timing_vec[i]), np.where(self.strikes<timing_vec[i+1]))
+            self.nsteps = len(self.strikes[tmp_idx])
+            results[phases_names[i]]['nsteps']= self.nsteps 
+            self.ex_time = timing_vec2[i+1] - timing_vec2[i]
+            results[phases_names[i]]['ex_time']= self.ex_time
+            self.cadence = self.nsteps / self.ex_time
+            results[phases_names[i]]['frequency']=  self.cadence 
+            
+            move= np.diff(hip_filtered[timing_vec[i]:timing_vec[i+1],:2], axis=0)
             lengthmove = sum(np.linalg.norm(move, axis=1))
-            self.speed =  lengthmove / self.ex_time      
-            file.writelines('Velocity: '+ str(format(self.speed,'.2f')) +' m/s\n') 
-            file.writelines('Acceleration: '+ str(format(self.speed/self.ex_time,'.2f')) +' m/s^2\n') 
+            self.speed =  lengthmove / self.ex_time    
+            results[phases_names[i]]['speed']= self.speed
+            results[phases_names[i]]['acceleration']=  self.speed/self.ex_time
 
-            move_z= np.diff(hip_filtered[timing_vec[1]:timing_vec[-2],2], axis=0)
+            move_z= np.diff(hip_filtered[timing_vec[i]:timing_vec[i+1],2], axis=0)
             lengthmove_z = sum(abs(move_z))
             self.speed_z =  lengthmove_z / self.ex_time      
-            file.writelines('Velocity in z: '+ str(format(self.speed_z,'.2f')) +' m/s\n') 
-            file.writelines('Acceleration in z: '+ str(format(self.speed_z/self.ex_time,'.2f')) +' m/s^2\n') 
+            results[phases_names[i]]['speed_z']= self.speed_z
+            results[phases_names[i]]['acceleration_z']= self.speed_z/self.ex_time
+
+        results['Full TUG']={}  
+        self.nsteps = len(self.strikes)
+        results['Full TUG']['nsteps']=self.nsteps
+        self.walking_time = timing_vec2[-2] - timing_vec2[1] #Durata totale del test: calcolata in automatico da quando il paziente si alza (gli ischi si staccano dalla sedia) a quando si risiede (gli ischi si appoggiano sulla sedia)
+        results['Full TUG']['walk_time']=self.walking_time
+        self.ex_time = timing_vec2[-1] - timing_vec2[0] #Durata totale del test: calcolata in automatico da quando il paziente si alza (gli ischi si staccano dalla sedia) a quando si risiede (gli ischi si appoggiano sulla sedia)
+        results['Full TUG']['ex_time']=self.ex_time 
+        results['Full TUG']['step_length']=self.step_length
+        results['Full TUG']['step_width']=self.step_width 
+        self.cadence = self.nsteps / self.walking_time
+        results['Full TUG']['frequency']=self.cadence
+            
+        move= np.diff(hip_filtered[timing_vec[1]:timing_vec[-2],:2], axis=0)
+        lengthmove = sum(np.linalg.norm(move, axis=1))
+        self.speed =  lengthmove / self.ex_time     
+        results['Full TUG']['speed']=self.speed
+        results['Full TUG']['acceleration']=self.speed/self.ex_time 
+
+        move_z= np.diff(hip_filtered[timing_vec[1]:timing_vec[-2],2], axis=0)
+        lengthmove_z = sum(abs(move_z))
+        self.speed_z =  lengthmove_z / self.ex_time      
+        results['Full TUG']['speed_z']=self.speed_z
+        results['Full TUG']['acceleration_z']=self.speed_z/self.ex_time 
+
+        f = open(f'{user_id}_metrics.pkl',"wb")
+        pickle.dump(results,f)
+        f.close()
                
+
 
 ###### General functions
 def compute_kinematics(skeleton, tag):
@@ -493,8 +495,7 @@ def compute_timing(skeleton, durata):
     return in_stand_idx, in_wf_idx, fin_wf_idx, fin_turn1_idx, fin_wb_idx, fin_turn2_idx, fin_sit_idx
 
 
-
-## Additional functions to load data
+######## Additional functions to load data
 def loadmat(filename):
     '''
     this function should be called instead of direct spio.loadmat
