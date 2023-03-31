@@ -220,7 +220,7 @@ class Step(Metric):
         self.durata= durata
 
 
-    def compute(self,skeleton, user_id):
+    def compute(self,skeleton, subj_id, num_trial):
         
         in_stand_idx, in_wf_idx, fin_wf_idx, fin_turn1_idx, fin_wb_idx, fin_turn2_idx, fin_sit_idx = compute_timing(skeleton, self.durata)
         timing_vec= [in_stand_idx, in_wf_idx, fin_wf_idx, fin_turn1_idx, fin_wb_idx, fin_turn2_idx, fin_sit_idx]
@@ -319,7 +319,7 @@ class Step(Metric):
         results['Full TUG']['speed_z']=self.speed_z
         results['Full TUG']['acceleration_z']=self.speed_z/self.ex_time 
 
-        f = open(f'{user_id}_metrics.pkl',"wb")
+        f = open(f'subj{subj_id}_tr{num_trial}_metrics.pkl',"wb")
         pickle.dump(results,f)
         f.close()
                

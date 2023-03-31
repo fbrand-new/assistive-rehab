@@ -4,13 +4,13 @@ from datetime import datetime
 import pickle
 
 
-def create_pdf_report(subject_id, num_trial, date, dict_results):
-#def create_pdf_report(subject_id, num_trial, date, dict_results, image):
+def create_pdf_report(subj_id, num_trial, date, dict_results):
+#def create_pdf_report(subj_id, num_trial, date, dict_results, image):
 
     with open(dict_results, 'rb') as f:
         results = pickle.load(f)
 
-    context = {'subject_id': subject_id, 'num_trial': num_trial, 'date': date, 
+    context = {'subject_id': subj_id, 'num_trial': num_trial, 'date': date, 
                'full_steps': results['Full TUG']['nsteps'], 'full_walking_time': str(format(results['Full TUG']['walk_time'],'.2f')), 'full_TUG_time': str(format(results['Full TUG']['ex_time'],'.2f')), 
                'mean_step_length': str(format(results['Full TUG']['step_length'],'.2f')), 'mean_step_width': str(format(results['Full TUG']['step_width'],'.2f')), 'full_frequency': str(format(results['Full TUG']['frequency'],'.2f')), 
                'full_speed': str(format(results['Full TUG']['speed'],'.2f')), 'full_acceleration': str(format(results['Full TUG']['acceleration'],'.2f')), 'full_speed_z': str(format(results['Full TUG']['speed_z'],'.2f')), 
@@ -40,7 +40,7 @@ def create_pdf_report(subject_id, num_trial, date, dict_results):
     output_text = template.render(context)
 
     config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
-    output_pdf = f'R1_TUG_report_sub{subject_id}_tr{num_trial}.pdf'
+    output_pdf = f'R1_TUG_report_sub{subj_id}_tr{num_trial}.pdf'
     #pdfkit.from_string(output_text, output_pdf, configuration=config, css='style.css')
     pdfkit.from_string(output_text, output_pdf, configuration=config)
 
@@ -48,14 +48,14 @@ def create_pdf_report(subject_id, num_trial, date, dict_results):
 
 
 
-def create_txt_report(subject_id, num_trial, dict_results):
+def create_txt_report(subj_id, num_trial, dict_results):
 
     phases_names= ['Standing', 'Walking forward', 'Turning1', 'Walking backward', 'Turning2', 'Sitting']
 
     with open(dict_results, 'rb') as f:
         results = pickle.load(f)
 
-    output_txt = f'R1_TUG_report_sub{subject_id}_tr{num_trial}.txt'
+    output_txt = f'R1_TUG_report_sub{subj_id}_tr{num_trial}.txt'
 
     with open (output_txt, 'w') as file:   #Durata delle sottofasi: alzata, cammino andata, curva, cammino ritorno, seduta, numero di passi totali e nelle varie fasi, cadenza (passi al minuto). 
         for i in range(6):
