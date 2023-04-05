@@ -43,7 +43,8 @@ class Manager : public yarp::os::RFModule,
     yarp::os::RpcClient navPort;
     yarp::os::BufferedPort<yarp::os::Bottle> scopePort;
 
-    enum class State { idle, sitting, standing, crossed } state;
+    enum class State { idle, sitting, standing, crossed, out_of_bounds} state;
+    State prev_state;
     bool standing;
 
     yarp::os::ResourceFinder *rf;
@@ -83,7 +84,9 @@ class Manager : public yarp::os::RFModule,
     yarp::sig::Vector shoulder_height;
     iCub::ctrl::AWLinEstimator *lin_est_shoulder;
     double shoulder_center_height_vel,standing_thresh,finishline_thresh;
-    std::vector<double> line_pose;
+    double _max_finish_line_overrun, _max_reasonable_ankles_dist;
+    std::vector<double> finish_line_pose;
+    std::vector<double> start_line_pose;
     yarp::sig::Matrix world_frame;
 
     yarp::os::Bottle bResult;
@@ -112,7 +115,8 @@ class Manager : public yarp::os::RFModule,
     bool setTemplateTag(const std::string &template_tag) override;
     bool mirrorTemplate(const bool robot_skeleton_mirror) override;
     bool stopFeedback() override;
-    bool setLinePose(const std::vector<double> &line_pose) override;
+    bool setStartLinePose(const std::vector<double> &start_line_pose) override;
+    bool setFinishLinePose(const std::vector<double> &finish_line_pose) override;
     yarp::os::Property getState() override;
 
     bool writeStructToMat(const std::string& name, const std::vector< std::vector< std::pair<std::string,yarp::sig::Vector> > >& keypoints_skel, mat_t *matfp);
@@ -129,7 +133,10 @@ class Manager : public yarp::os::RFModule,
     void getSkeleton();
     bool isStanding();
     bool isSitting();
+    bool hasCrossedLine(std::vector<double>& line);
     bool hasCrossedFinishLine();
+    bool hasCrossedStartLine();
+    bool hasMovedAwayFromFinishLine();
     yarp::os::Property publishState();
     void updateState();
     void estimate();

@@ -591,6 +591,7 @@ class Detector : public RFModule, public lineDetector_IDL
         p0[0]=lines_pose_world[i][0];
         p0[1]=lines_pose_world[i][1];
         p0[2]=lines_pose_world[i][2];
+        yDebug() << "*********" << line_tag << p0[0] << p0[1] <<p0[2];
         yarp::sig::Vector p1=p0+llen*u;
         std::vector<int> color(3,0.0);
         if(line_tag=="start-line")
@@ -667,10 +668,20 @@ class Detector : public RFModule, public lineDetector_IDL
             lineFrame.setRow(3,yarp::sig::Vector(3,0.0));
             yarp::sig::Matrix T=SE3inv(camFrame*lineFrame);
             M=T*camFrame;
+            yDebug() << "start line";
+            yDebug() << "camFrame" << camFrame.toString();
+            yDebug() << "lineFrame" << lineFrame.toString();
+            yDebug() << "T" << T.toString();          
+            yDebug() << "M" << M.toString();        
+            yDebug() << "lineFrame-1" << SE3inv(lineFrame).toString();   
         }
         if (line=="finish-line")
         {
             M=navFrame*camFrame;
+            yDebug() << "finish-line";
+            yDebug() << "navFrame" << navFrame.toString();
+            yDebug() << "camFrame" << camFrame.toString();        
+            yDebug() << "M" << M.toString();       
         }
         return M;
     }
@@ -775,7 +786,8 @@ class Detector : public RFModule, public lineDetector_IDL
                 robot_location[5]=1.0;
                 robot_location[6]=(M_PI/180)*loc->get(2).asFloat64();
                 navFrame=yarp::math::axis2dcm(robot_location.subVector(3,6));
-                navFrame.setSubcol(robot_location.subVector(0,2),0,3);              
+                navFrame.setSubcol(robot_location.subVector(0,2),0,3);  
+              //  yDebug() << " >>>>>>>>>>>NavFrame" << navFrame.toString();          
                 updated_nav=true;
                 return true;
             }

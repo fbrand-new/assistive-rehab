@@ -2,12 +2,13 @@ import jinja2
 import pdfkit
 from datetime import datetime
 import pickle
+import os
 
 
-def create_pdf_report(subj_id, num_trial, date, dict_results):
-#def create_pdf_report(subj_id, num_trial, date, dict_results, image):
+def create_pdf_report(subj_id, num_trial, date, pth):
+#def create_pdf_report(subj_id, num_trial, date, pth, image):
 
-    with open(dict_results, 'rb') as f:
+    with open(f"{pth}/metrics.pkl", 'rb') as f:
         results = pickle.load(f)
 
     context = {'subject_id': subj_id, 'num_trial': num_trial, 'date': date, 
@@ -30,7 +31,8 @@ def create_pdf_report(subj_id, num_trial, date, dict_results):
                'turn1_acceleration_z': str(format(results['Turning1']['acceleration_z'],'.2f')),
                'turn2_steps': results['Turning2']['nsteps'], 'turn2_time': str(format(results['Turning2']['ex_time'],'.2f')), 'turn2_frequency': str(format(results['Turning2']['frequency'],'.2f')), 
                'turn2_speed': str(format(results['Turning2']['speed'],'.2f')), 'turn2_acceleration': str(format(results['Turning2']['acceleration'],'.2f')), 'turn2_speed_z': str(format(results['Turning2']['speed_z'],'.2f')), 
-               'turn2_acceleration_z': str(format(results['Turning2']['acceleration_z'],'.2f'))}#, 'image': image}
+               'turn2_acceleration_z': str(format(results['Turning2']['acceleration_z'],'.2f')),
+               'image_path': os.path.join(pth,'TUG_phases_analysis.png')}#, 'image': image}
 
     template_loader = jinja2.FileSystemLoader('./')
     template_env = jinja2.Environment(loader=template_loader)
@@ -40,22 +42,22 @@ def create_pdf_report(subj_id, num_trial, date, dict_results):
     output_text = template.render(context)
 
     config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
-    output_pdf = f'R1_TUG_report_sub{subj_id}_tr{num_trial}.pdf'
+    output_pdf = f'{pth}/R1_TUG_report.pdf'
     #pdfkit.from_string(output_text, output_pdf, configuration=config, css='style.css')
-    pdfkit.from_string(output_text, output_pdf, configuration=config)
+    pdfkit.from_string(output_text, output_pdf, configuration=config, options={"enable-local-file-access": ""})
 
 
 
 
 
-def create_txt_report(subj_id, num_trial, dict_results):
+def create_txt_report(subj_id, num_trial, pth):
 
     phases_names= ['Standing', 'Walking forward', 'Turning1', 'Walking backward', 'Turning2', 'Sitting']
 
-    with open(dict_results, 'rb') as f:
+    with open(f"{pth}/metrics.pkl", 'rb') as f:
         results = pickle.load(f)
 
-    output_txt = f'R1_TUG_report_sub{subj_id}_tr{num_trial}.txt'
+    output_txt = f'{pth}/R1_TUG_report.txt'
 
     with open (output_txt, 'w') as file:   #Durata delle sottofasi: alzata, cammino andata, curva, cammino ritorno, seduta, numero di passi totali e nelle varie fasi, cadenza (passi al minuto). 
         for i in range(6):
