@@ -248,6 +248,7 @@ class Retriever : public RFModule
     double period;
     double fov_h;
     double fov_v;
+    double fx, fy, cx, cy;
     double keys_recognition_confidence;
     double keys_recognition_percentage;
     int keys_acceptable_misses;
@@ -288,16 +289,16 @@ class Retriever : public RFModule
     {
         if ((u>=0) && (u<depth.width()) && (v>=0) && (v<depth.height()))
         {
-            double f=CamParamsHelper(depth.width(),depth.height(),fov_h).get_focal();
+            //double f=CamParamsHelper(depth.width(),depth.height(),fov_h).get_focal();
             double d=depth(u,v);
-            if ((d>0.0) && (f>0.0))
+            if ((d>0.0) && (fx>0.0))
             {
-                double x=u-0.5*(depth.width()-1);
-                double y=v-0.5*(depth.height()-1);
+                double x=u-cx;
+                double y=v-cy;
 
                 p=d*ones(3);
-                p[0]*=x/f;
-                p[1]*=y/f;
+                p[0]*=x/fx;
+                p[1]*=y/fy;
 
                 return true;
             }
@@ -341,6 +342,13 @@ class Retriever : public RFModule
 
                     if ((confidence>=keys_recognition_confidence) && getPoint3D(u,v,p))
                     {
+                        //yDebug() << tag;
+                        if(tag=="MidHip")
+                        {
+                            yDebug() << u << "," << v << "," << p[0] << "," << p[1] << "," << p[2]; ;
+                            //yDebug() << p[0] << "," << p[1] << "," << p[2]; 
+                        }
+
                         pixel[0]=u; pixel[1]=v;
                         auto pair_=make_pair(keysRemap[tag],make_pair(p,pixel));
 
@@ -695,7 +703,7 @@ class Retriever : public RFModule
     {
         if (Property* p=gazePort.read(false))
         {
-            if (Bottle* b=p->find("depth_rgb").asList())
+            if (Bottle* b=p->find("depth_custom").asList())
             {
                 if (b->size()>=7)
                 {
@@ -704,6 +712,8 @@ class Retriever : public RFModule
                     {
                         pos[i]=b->get(i).asFloat64();
                     }
+
+                    pos[2] += 0.16;
 
                     Vector ax(4);
                     for (size_t i=0; i<ax.length(); i++)
@@ -868,6 +878,21 @@ class Retriever : public RFModule
             if (gCamera.check("remote"))
             {
                 camera_remote = gCamera.find("remote").asString();
+            }
+            if (Bottle *intrinsics = gCamera.find("intrinsics").asList())
+            {
+                if(intrinsics->size() >= 4)
+                {
+                    fx = intrinsics->get(0).asFloat64();
+                    fy = intrinsics->get(1).asFloat64();
+                    cx = intrinsics->get(2).asFloat64();
+                    cy = intrinsics->get(3).asFloat64();
+
+                    yInfo()<<"camera fx (from file) ="<<fx;
+                    yInfo()<<"camera fy (from file) ="<<fy;
+                    yInfo()<<"camera cx (from file) ="<<cx;
+                    yInfo()<<"camera cy (from file) ="<<cy;
+                }
             }
         }
 

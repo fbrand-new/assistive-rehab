@@ -844,6 +844,7 @@ bool Manager::updateModule()
         _was_person_out_of_bounds = false;
         if (Time::now()-t0>10.0)
         {
+            yDebug() << "Possibly changing state at time" << Time::now();
             if (lock)
             {
                 state=obstacle_manager->hasObstacle()

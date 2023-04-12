@@ -668,20 +668,10 @@ class Detector : public RFModule, public lineDetector_IDL
             lineFrame.setRow(3,yarp::sig::Vector(3,0.0));
             yarp::sig::Matrix T=SE3inv(camFrame*lineFrame);
             M=T*camFrame;
-            yDebug() << "start line";
-            yDebug() << "camFrame" << camFrame.toString();
-            yDebug() << "lineFrame" << lineFrame.toString();
-            yDebug() << "T" << T.toString();          
-            yDebug() << "M" << M.toString();        
-            yDebug() << "lineFrame-1" << SE3inv(lineFrame).toString();   
         }
         if (line=="finish-line")
         {
             M=navFrame*camFrame;
-            yDebug() << "finish-line";
-            yDebug() << "navFrame" << navFrame.toString();
-            yDebug() << "camFrame" << camFrame.toString();        
-            yDebug() << "M" << M.toString();       
         }
         return M;
     }
@@ -761,8 +751,10 @@ class Detector : public RFModule, public lineDetector_IDL
         if (Property *p=gazeStatePort.read(false))
         {
             yarp::sig::Vector pose;
-            p->find("depth_rgb").asList()->write(pose);
+            p->find("depth_custom").asList()->write(pose);
             camFrame=yarp::math::axis2dcm(pose.subVector(3,6));
+            camFrame.setSubcol(pose.subVector(0,2),0,3);         
+            pose[2] += 0.16; //correcting base position from floor
             camFrame.setSubcol(pose.subVector(0,2),0,3);
             updated_cam=true;
             return true;
@@ -967,10 +959,10 @@ class Detector : public RFModule, public lineDetector_IDL
                 
                 yInfo() << "Camera intrinsics:" << fx << fy << px << py;
                 
-                cam_intrinsics.at<double>(0, 0) = fx;
-                cam_intrinsics.at<double>(0, 2) = px;
-                cam_intrinsics.at<double>(1, 1) = fy;
-                cam_intrinsics.at<double>(1, 2) = py;
+                cam_intrinsics.at<double>(0, 0) = fy;
+                cam_intrinsics.at<double>(0, 2) = py;
+                cam_intrinsics.at<double>(1, 1) = fx;
+                cam_intrinsics.at<double>(1, 2) = px;
                 cam_intrinsics.at<double>(2, 2) = 1.0;
 
                 cam_distortion.at<double>(0, 0) = 0.0; //k1;
