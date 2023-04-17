@@ -78,13 +78,13 @@
 
     <module>
         <name>lineDetector</name>
-        <parameters>--camera::remote /cer/realsense_repeater</parameters>
+        <parameters>--camera::remote /cer/realsense_repeater --camera::intrinsics "(600.70149,598.9311,241.44921875,293.984375)"</parameters>
         <node>container-console</node>
     </module>
 
     <module>
         <name>skeletonRetriever</name>
-        <parameters> --camera::fov "(43 70)"  --depth::enable true --depth::kernel-size 8  --depth::iterations 1 --depth::min-distance 0.5 --depth::max-distance 6.0 --filter-keypoint-order 8</parameters>
+        <parameters> --camera::fov "(43 70)"  --depth::enable true --depth::kernel-size 8  --depth::iterations 1 --depth::min-distance 0.5 --depth::max-distance 6.0 --filter-keypoint-order 8 --camera::intrinsics "(600.70149,598.9311,241.44921875,293.984375)"</parameters>
         <node>container-console</node>
     </module>
 

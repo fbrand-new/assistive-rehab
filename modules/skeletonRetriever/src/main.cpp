@@ -15,6 +15,7 @@
 #include <limits>
 #include <algorithm>
 #include <vector>
+#include <queue>
 #include <unordered_map>
 #include <iterator>
 #include <utility>
@@ -237,6 +238,7 @@ class Retriever : public RFModule
     PolyDriver rgbdDrv;
 
     Matrix navFrame, gazeFrame, rootFrame;
+    std::queue<Matrix> bufferGazeFrame;
     bool navFrameUpdated, gazeFrameUpdated;
 
     ImageOf<PixelFloat> depth;
@@ -343,11 +345,6 @@ class Retriever : public RFModule
                     if ((confidence>=keys_recognition_confidence) && getPoint3D(u,v,p))
                     {
                         //yDebug() << tag;
-                        if(tag=="MidHip")
-                        {
-                            yDebug() << u << "," << v << "," << p[0] << "," << p[1] << "," << p[2]; ;
-                            //yDebug() << p[0] << "," << p[1] << "," << p[2]; 
-                        }
 
                         pixel[0]=u; pixel[1]=v;
                         auto pair_=make_pair(keysRemap[tag],make_pair(p,pixel));
@@ -724,11 +721,14 @@ class Retriever : public RFModule
                     gazeFrame=axis2dcm(ax);
                     gazeFrame.setSubcol(pos,0,3);
                     gazeFrameUpdated=true;
+                    
+                    bufferGazeFrame.push(gazeFrame);
                     return true;
                 }
             }
         }
-
+        bufferGazeFrame.push(gazeFrame);
+        
         return false;
     }
 
@@ -976,7 +976,17 @@ class Retriever : public RFModule
         // update external frames
         update_nav_frame();
         update_gaze_frame();
-        rootFrame=navFrame*gazeFrame;
+        //rootFrame=navFrame*gazeFrame;
+        if(bufferGazeFrame.size() < 2)
+        {
+            rootFrame=navFrame*(bufferGazeFrame.front());
+        }
+        else
+        {
+            rootFrame=navFrame*(bufferGazeFrame.front());
+            bufferGazeFrame.pop();
+        }
+            
 
         // handle skeletons acquired from detector
         if (Bottle *b1=skeletonsPort.read(false))
@@ -993,6 +1003,37 @@ class Retriever : public RFModule
                         shared_ptr<MetaSkeleton> s=create(b3);
                         if (isValid(s))
                         {
+<<<<<<< HEAD
+=======
+                            //yDebug() << s.get()->skeleton.get()->keypoints[0].getPoint().toString();
+                            //SkeletonStd k = ;
+                          //  std::string sss = std::string("head");
+                            auto l = s->skeleton;
+                            auto p = applyTransform(l);
+
+                            yDebug() << (*p)["shoulderCenter"]->getPoint().toString() << (*l)["shoulderCenter"]->getPoint().toString();
+                            // yDebug() << w.toString() << " " << (*p)["Neck"]->getPoint().toString() <<
+                            //             (*l)["Neck"]->getPoint().toString() <<
+                            // yDebug() <<
+                            //             rootFrame[0][0] << 
+                            //             rootFrame[0][1] << 
+                            //             rootFrame[0][2] <<
+                            //             rootFrame[0][3] <<
+                            //             rootFrame[1][0] <<
+                            //             rootFrame[1][1] <<
+                            //             rootFrame[1][2] <<
+                            //             rootFrame[1][3] <<
+                            //             rootFrame[2][0] <<
+                            //             rootFrame[2][1] <<
+                            //             rootFrame[2][2] <<
+                            //             rootFrame[2][3] <<
+                            //             rootFrame[3][0] <<
+                            //             rootFrame[3][1] <<
+                            //             rootFrame[3][2] <<
+                            //             rootFrame[3][3];
+
+                          //  yDebug() << *(s->skeleton)[std::string("head")]->getPoint().toString();
+>>>>>>> 5117dbd (Skeleton delay when moving head softened)
                             new_accepted_skeletons.push_back(s);
                         }
                     }

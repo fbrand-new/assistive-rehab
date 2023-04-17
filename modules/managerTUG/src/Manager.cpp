@@ -874,6 +874,7 @@ bool Manager::updateModule()
             //send an error to the event collector
             Bottle &skel_err_bot = skeletonErrorPort.prepare();
             skel_err_bot.addString(tag);
+            yDebug() << "Skeleton error tag is" << tag;
             skeletonErrorPort.write();
             disengage();
 
@@ -1276,7 +1277,7 @@ bool Manager::updateModule()
                             ? State::obstacle : State::assess_standing;
                         reinforce_obstacle_cnt=0;
                         t0=Time::now();
-                         //TODO: move before vocal interaction
+                        //TODO: move before vocal interaction
                     }
                 }
             }
