@@ -391,6 +391,7 @@ bool Manager::trigger()
     {
         if(trigger_manager->isRunning())
         {
+            question_time_tstart = Time::now()+10; //10 extra seconds to ask the question and let R1 answer
             trigger_manager->trigger();
             return true;
         }

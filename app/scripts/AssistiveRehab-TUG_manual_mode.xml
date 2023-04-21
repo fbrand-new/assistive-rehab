@@ -60,7 +60,7 @@
 
     <module>
         <name>joystickCtrl</name>
-        <parameters>--context AssistiveRehab --from jostick_trigger_8bitdo.ini</parameters>
+        <parameters>--context AssistiveRehab --from joystick_trigger_8bitdo.ini</parameters>
         <node>container-console</node>
     </module>
 
