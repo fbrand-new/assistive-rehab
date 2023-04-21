@@ -263,7 +263,7 @@
     </connection>
 
     <connection>
-        <from>/cer_gaze-controller/state:o</from>
+        <from>/yarpOpenPose/frame:o</from>
         <to>/skeletonRetriever/gaze:i</to>
         <protocol>fast_tcp</protocol>
     </connection>
@@ -537,4 +537,11 @@
         <to>/eventCollector/skeleton:i</to>
         <protocol>fast_tcp</protocol>
     </connection>
+    
+    <connection>
+        <from>/cer_gaze-controller/state:o</from>
+        <to>/yarpOpenPose/gaze:i</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+
 </application>

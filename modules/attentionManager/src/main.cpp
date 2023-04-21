@@ -362,17 +362,17 @@ class Attention : public RFModule, public attentionManager_IDL
     bool set_gaze_T(const double T) const
     {
         //TODO: temporary hack to fix the gaze
-        Bottle cmd,rep;
-        cmd.addVocab32("set");
-        cmd.addString("T");
-        cmd.addFloat64(T);
-        if (gazeCmdPort.write(cmd,rep))
-        {
-            return (rep.get(0).asVocab32()==ack);
-        }
-        return false;
+        // Bottle cmd,rep;
+        // cmd.addVocab32("set");
+        // cmd.addString("T");
+        // cmd.addFloat64(T);
+        // if (gazeCmdPort.write(cmd,rep))
+        // {
+        //     return (rep.get(0).asVocab32()==ack);
+        // }
+        // return false;
 
-        //return true;
+        return true;
     }
 
     /****************************************************************/
@@ -393,15 +393,15 @@ class Attention : public RFModule, public attentionManager_IDL
         options.put("target-location",loc.get(0));
 
         //TODO: fbrand temporary hack to fix the gaze
-        Bottle cmd,rep;
-        cmd.addVocab32("look");
-        cmd.addList().read(options);
-        if (gazeCmdPort.write(cmd,rep))
-        {
-            return (rep.get(0).asVocab32()==ack);
-        }
-        return false;
-        //return true;
+        // Bottle cmd,rep;
+        // cmd.addVocab32("look");
+        // cmd.addList().read(options);
+        // if (gazeCmdPort.write(cmd,rep))
+        // {
+        //     return (rep.get(0).asVocab32()==ack);
+        // }
+        // return false;
+        return true;
     }
 
     /****************************************************************/

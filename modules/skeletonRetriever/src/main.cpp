@@ -1003,37 +1003,6 @@ class Retriever : public RFModule
                         shared_ptr<MetaSkeleton> s=create(b3);
                         if (isValid(s))
                         {
-<<<<<<< HEAD
-=======
-                            //yDebug() << s.get()->skeleton.get()->keypoints[0].getPoint().toString();
-                            //SkeletonStd k = ;
-                          //  std::string sss = std::string("head");
-                            auto l = s->skeleton;
-                            auto p = applyTransform(l);
-
-                            yDebug() << (*p)["shoulderCenter"]->getPoint().toString() << (*l)["shoulderCenter"]->getPoint().toString();
-                            // yDebug() << w.toString() << " " << (*p)["Neck"]->getPoint().toString() <<
-                            //             (*l)["Neck"]->getPoint().toString() <<
-                            // yDebug() <<
-                            //             rootFrame[0][0] << 
-                            //             rootFrame[0][1] << 
-                            //             rootFrame[0][2] <<
-                            //             rootFrame[0][3] <<
-                            //             rootFrame[1][0] <<
-                            //             rootFrame[1][1] <<
-                            //             rootFrame[1][2] <<
-                            //             rootFrame[1][3] <<
-                            //             rootFrame[2][0] <<
-                            //             rootFrame[2][1] <<
-                            //             rootFrame[2][2] <<
-                            //             rootFrame[2][3] <<
-                            //             rootFrame[3][0] <<
-                            //             rootFrame[3][1] <<
-                            //             rootFrame[3][2] <<
-                            //             rootFrame[3][3];
-
-                          //  yDebug() << *(s->skeleton)[std::string("head")]->getPoint().toString();
->>>>>>> 5117dbd (Skeleton delay when moving head softened)
                             new_accepted_skeletons.push_back(s);
                         }
                     }
