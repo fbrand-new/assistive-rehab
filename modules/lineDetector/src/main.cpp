@@ -668,10 +668,20 @@ class Detector : public RFModule, public lineDetector_IDL
             lineFrame.setRow(3,yarp::sig::Vector(3,0.0));
             yarp::sig::Matrix T=SE3inv(camFrame*lineFrame);
             M=T*camFrame;
+            yDebug() << "start line";
+            yDebug() << "camFrame" << camFrame.toString();
+            yDebug() << "lineFrame" << lineFrame.toString();
+            yDebug() << "T" << T.toString();          
+            yDebug() << "M" << M.toString();        
+            yDebug() << "lineFrame-1" << SE3inv(lineFrame).toString();   
         }
         if (line=="finish-line")
         {
             M=navFrame*camFrame;
+            yDebug() << "finish-line";
+            yDebug() << "navFrame" << navFrame.toString();
+            yDebug() << "camFrame" << camFrame.toString();        
+            yDebug() << "M" << M.toString();       
         }
         return M;
     }
