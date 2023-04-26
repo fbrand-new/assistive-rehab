@@ -347,7 +347,7 @@ def compute_kinematics(skeleton, tag):
 
 
 def compute_timing(skeleton, durata):
-    dur= durata #49
+    dur=durata #49
     nsigma=3
 
     vel_shoulCenter_x, vel_shoulCenter_y, vel_shoulCenter_z, acc_shoulCenter_x, acc_shoulCenter_y, acc_shoulCenter_z= compute_kinematics(skeleton, "shoulderCenter")
@@ -374,12 +374,9 @@ def compute_timing(skeleton, durata):
     #print(init_std)
     cond1 = np.where(np.abs((acc_hipCenter_z-init_mean)/init_std) > nsigma)[0]
     cond2=np.where(np.diff(np.sign(acc_hipCenter_y-acc_shoulCenter_y)))[0]
-    # print(cond1)
-    # print(cond2)
     in_stand_idx= np.intersect1d(cond1,cond2)[0]
 
     #in_stand_idx= cond1[0]
-    #print(in_stand_idx)
 
     ### Camminata di andata ###
 
@@ -439,10 +436,9 @@ def compute_timing(skeleton, durata):
         foot_cross0m = rfoot_cross0m
     else:
         foot_cross0m = lfoot_cross0m
-    fin_wb_idx=np.intersect1d(cond1,foot_cross0m)[0]+fin_turn1_idx
 
+    #     fin_wb_idx=np.intersect1d(cond1,foot_cross0m)[0]+fin_turn1_idx
     # alternativa:
-
     diff_shoul = abs(skeleton.getKeypoint("shoulderRight")[:,0]-skeleton.getKeypoint("shoulderLeft")[:,0])
     cond1= np.array(np.where(diff_shoul[fin_turn1_idx:]<(diff_shoul[0]-0.1)))[0]
     #cond2 = np.array(np.where(vel_shoulCenter_y[fin_wf_idx:]>0.))[0]#

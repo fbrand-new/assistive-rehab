@@ -1,6 +1,13 @@
 <application>
 <name>Assistive Rehabilitation skeletonDumper Real App</name>
 
+   <!--> Camera <!-->
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/skeletons-img --type image_jpg --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
     <module>
         <name>yarpdatadumper</name>
         <parameters>--name /dump/skeletons-data --rxTime --txTime</parameters>
@@ -28,6 +35,55 @@
     <module>
         <name>yarpdatadumper</name>
         <parameters>--name /dump/gaze-save --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+   <!--> Robot joints <!-->
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/robot-left-arm --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/robot-left-wrist-tripod --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/robot-right-arm --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/robot-right-wrist-tripod --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/robot-head --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters>--name /dump/robot-torso --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters> --name /dump/robot-torso-tripod --rxTime --txTime</parameters>
+        <node>localhost</node>
+    </module>
+
+    <module>
+        <name>yarpdatadumper</name>
+        <parameters> --name /dump/lidar --rxTime --txTime</parameters>
         <node>localhost</node>
     </module>
 

@@ -1003,6 +1003,9 @@ class Retriever : public RFModule
                         shared_ptr<MetaSkeleton> s=create(b3);
                         if (isValid(s))
                         {
+                            auto l = s->skeleton;
+                            auto p = applyTransform(l);
+                            yDebug() << (*p)["shoulderCenter"]->getPoint().toString();
                             new_accepted_skeletons.push_back(s);
                         }
                     }

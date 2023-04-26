@@ -1411,14 +1411,14 @@ bool Manager::updateModule()
         //vector<shared_ptr<SpeechParam>> p;
         //p.push_back(shared_ptr<SpeechParam>(new SpeechParam(round(t*10.0)/10.0)));
         Bottle cmd,rep;
-        cmd.addString("stop");
-        analyzerPort.write(cmd,rep);
         Speech s("assess-high");
         //s.setParams(p);
         speak(s);
         s.reset();
         s.setKey("greetings");
         speak(s);
+        cmd.addString("stop");
+        analyzerPort.write(cmd,rep);
         success_status="passed";
         cmd.clear();
         cmd.addString("stop");
@@ -1431,8 +1431,7 @@ bool Manager::updateModule()
         yCDebug(MANAGERTUG) << "Entering state::not_passed";
         prev_state=state;
         Bottle cmd,rep;
-        cmd.addString("stop");
-        analyzerPort.write(cmd,rep);
+
         Speech s("end",true,false);
         speak(s);
         s.reset();
@@ -1449,6 +1448,8 @@ bool Manager::updateModule()
         s.setKey("greetings");
         speak(s);
         success_status = "not_passed";
+        cmd.addString("stop");
+        analyzerPort.write(cmd,rep);
         cmd.clear();
         cmd.addString("stop");
         collectorPort.write(cmd, rep);
