@@ -427,12 +427,16 @@ def compute_timing(skeleton, durata):
 
     # Correggo l'alzata
     vel_shoulCenter_z_flip= np.flip(vel_shoulCenter_z[0:in_wf_idx])
-    cond1 = np.where(np.abs(vel_shoulCenter_z_flip)< 0.005)[0]
+    cond1 = np.where(np.abs(vel_shoulCenter_z_flip)< 0.05)[0]
     vel_hipCenter_z_flip= np.flip(vel_hipCenter_z[0:in_wf_idx])
-    cond2 = np.where(np.abs(vel_hipCenter_z_flip)< 0.005)[0]
+    cond2 = np.where(np.abs(vel_hipCenter_z_flip)< 0.05)[0]
     
     in_stand_idx= np.intersect1d(cond1,cond2)[0]
+    print(in_stand_idx)
     in_stand_idx= in_wf_idx-in_stand_idx
+
+    print(in_wf_idx)
+    print(in_stand_idx)
 
 
     ### Fase di rotazione 1 ###

@@ -18,3 +18,4 @@ cp ${ETAPAS_MOTION_DIR}/${LAST_MOTION_FILE} ${TRIAL_DIR}/data.mat
 cp ${ETAPAS_EVENT_DIR}/${LAST_EVENT_FILE} ${TRIAL_DIR}
 
 #TODO: complete with the dump files
+mv ~/dump $TRIAL_DIR

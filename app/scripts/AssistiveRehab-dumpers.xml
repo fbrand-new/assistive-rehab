@@ -1,96 +1,40 @@
 <application>
-<name>AssistiveK Rehabilitation skeletonDumper Real App</name>
-
-   <!--> Camera <!-->
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/skeletons-img --type image_jpg --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
+<name>Assistive Rehabilitation skeletonDumper Real App</name>
 
     <module>
         <name>yarpdatadumper</name>
         <parameters>--name /dump/skeletons-data --rxTime --txTime</parameters>
-        <node>localhost</node>
+        <node>console</node>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <parameters>--name /dump/depth --type depth --rxTime --txTime</parameters>
-        <node>localhost</node>
+        <node>console</node>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
-        <parameters>--name /skeletonDumper/opc-save --rxTime --txTime</parameters>
-        <node>localhost</node>
+        <parameters>--name /dump/opc-save --rxTime --txTime</parameters>
+        <node>console</node>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <parameters>--name /dump/nav-save --rxTime --txTime</parameters>
-        <node>localhost</node>
+        <node>console</node>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <parameters>--name /dump/gaze-save --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-   <!--> Robot joints <!-->
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/robot-left-arm --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/robot-left-wrist-tripod --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/robot-right-arm --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/robot-right-wrist-tripod --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/robot-head --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters>--name /dump/robot-torso --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters> --name /dump/robot-torso-tripod --rxTime --txTime</parameters>
-        <node>localhost</node>
-    </module>
-
-    <module>
-        <name>yarpdatadumper</name>
-        <parameters> --name /dump/lidar --rxTime --txTime</parameters>
-        <node>localhost</node>
+        <node>console</node>
     </module>
 
     <module>
         <name>yarpdatadumper</name>
         <parameters> --name /dump/skeletonretriever --rxTime --txTime</parameters>
-        <node>localhost</node>
+        <node>console</node>
     </module>
     
    <!--> Connection Camera <!-->
