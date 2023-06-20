@@ -331,6 +331,8 @@ class Retriever : public RFModule
         bool hip_center_detected=false;
 
         Vector p,pixel(2);
+        Vector shoulders_pixels(2);
+        Vector hip_pixels(2);
         for (size_t i=0; i<keys->size(); i++)
         {
             if (Bottle *k=keys->get(i).asList())
@@ -374,6 +376,7 @@ class Retriever : public RFModule
                         // use (left + right)/2 as fallback
                         if (keysRemap[tag]==KeyPointTag::shoulder_center)
                         {
+                            yDebug() << "Should cent";
                             shoulder_center_detected=true;
                             s->pivots[0]=pixel;
                         }
@@ -381,16 +384,22 @@ class Retriever : public RFModule
                                  (keysRemap[tag]==KeyPointTag::shoulder_right))
                         {
                             shoulders.push_back(p);
+                            shoulders_pixels[0] += p[0]/2;
+                            shoulders_pixels[1] += p[1]/2;
                         }
                         else if (keysRemap[tag]==KeyPointTag::hip_center)
                         {
+                            yDebug() << "hip cent";
                             hip_center_detected=true;
                             s->pivots[1]=pixel;
                         }
                         else if ((keysRemap[tag]==KeyPointTag::hip_left) ||
                                  (keysRemap[tag]==KeyPointTag::hip_right))
                         {
+                            yDebug() << "hip lr";
                             hips.push_back(p);
+                            hip_pixels[0] += p[0]/2;
+                            hip_pixels[1] += p[1]/2;
                         }
                     }
                 }
@@ -422,12 +431,14 @@ class Retriever : public RFModule
             pixel=numeric_limits<double>::quiet_NaN();
             unordered.push_back(make_pair(KeyPointTag::shoulder_center,
                                           make_pair(0.5*(shoulders[0]+shoulders[1]),pixel)));
+            s->pivots[0]=shoulders_pixels;
         }
         if (!hip_center_detected && (hips.size()==2))
         {
             pixel=numeric_limits<double>::quiet_NaN();
             unordered.push_back(make_pair(KeyPointTag::hip_center,
                                           make_pair(0.5*(hips[0]+hips[1]),pixel)));
+            s->pivots[1]=hip_pixels;
         }
 
         s->skeleton->update_withpixels(unordered);
